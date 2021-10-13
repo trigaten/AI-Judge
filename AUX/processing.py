@@ -1,3 +1,4 @@
+"""Set of functions which help parse and clean data and load it into pandas dataframes"""
 import pandas as pd
 import re
 import math
