@@ -16,7 +16,7 @@ Pytorch
 
 ## Data Source
 
-https://pushshift.io/
+https://files.pushshift.io/reddit/ Remember AITA started in 2013, so we only need data from there on.
 
 ### AUX
 Contains files from some simple classification experiments I was doing previously with post-only data. It contains some useful functionality like loading csv into 
