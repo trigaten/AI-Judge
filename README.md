@@ -7,7 +7,11 @@
 ## Algorithm/training/DL Review!
 
 Seq2seq+attention
+
+GRUs
+
 Teacher forcing, Curriculum learning
+
 Pytorch
 
 ## Data Source
