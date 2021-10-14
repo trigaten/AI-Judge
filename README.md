@@ -2,7 +2,7 @@
 
 ## Literature Review!
 
- [https://arxiv.org/pdf/2101.07664.pdf][AITA post classification]
+ [https://arxiv.org/pdf/2101.07664.pdf](AITA post classification)
 
 
 ### AUX
