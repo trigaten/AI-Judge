@@ -10,9 +10,13 @@ Seq2seq+attention
 
 GRUs
 
+[LSTMs](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+
 Teacher forcing, Curriculum learning
 
 Pytorch
+
+
 
 ## Data Source
 
