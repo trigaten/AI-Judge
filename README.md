@@ -12,6 +12,8 @@ GRUs
 
 [LSTMs](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
 
+[Word2vec embeddings](https://www.youtube.com/watch?v=QyrUentbkvw)
+
 Teacher forcing, Curriculum learning
 
 Pytorch
