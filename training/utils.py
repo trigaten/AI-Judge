@@ -10,10 +10,13 @@ from nltk.tokenize import word_tokenize
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
+TAGS = ('YTA', 'NTA', 'NAH', 'ESH')
+
 def read_json(path):
     return pd.read_json(path)
 
-def tokenize_df(df):
+def preprocess(df, binary_classes=True):
+    "tokenizes and"
     # Select columns to apply preprocessing to
     pp_cols = ["title", "body", "comment_body"]
 
@@ -26,8 +29,13 @@ def tokenize_df(df):
     # get rid of now redundant title column
     df.drop(columns=["title"], axis=1, inplace=True)
 
+    if binary_classes:
+        df["judgement"] = df["judgement"].map({"YTA":1, "ESH":1, "NTA":0, "NAH":0})
+    else
+        raise "deal with this later"
+        
     return df
 
 if __name__ == "__main__":
     df = read_json("example.json")
-    print(tokenize_df(df))
+    print(preprocess(df))
