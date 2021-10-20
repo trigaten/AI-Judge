@@ -26,29 +26,24 @@ def main() :
         if post['score'] < 50 :
             continue
 
-        top_comment = {"comment_id": None, "score": 50}
+        top_comment = {'comment_id': None, 'score': 50}
         for comment in comments :
-            post_id = comment["post_id"][3:]
-            if post_id == post["id"] :
+            post_id = comment['post_id'][3:]
+            if post_id == post['id'] :
                 judgement = comment['body'][0:3].upper()
                 if (comment['score'] > top_comment['score'] and 
                     judgement in TAGS) :
                     post['judgement'] = judgement
                     top_comment = comment
         
-        if top_comment["comment_id"] == None :
+        if top_comment['comment_id'] == None :
             continue
 
-        top_comment = dict(top_comment)
-        del post['id']
-        del post['author']
-        del top_comment['post_id']
-        del top_comment['comment_id']
-        del top_comment['author']
-        
+        zipped = {'title': post['title'], 'post_body': post['body'], 'judgement': post['judgement'], 'comment_body': top_comment['body']}
+
         linked += 1
         
-        end_list.append({"post": post, "comment": top_comment})
+        end_list.append(zipped)
 
     print(f"Done linking. (Found {len(end_list)} matches)")
 
