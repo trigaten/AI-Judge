@@ -1,16 +1,14 @@
 """Utility functions to help with dataloading and preprocessing"""
 
+__author__ = "Sander Schulhoff"
+__email__ = "sanderschulhoff@gmail.com"
+
 import pandas as pd
 
 import nltk
 # pretrained tokenizer
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize 
-
-__author__ = "Sander Schulhoff"
-__email__ = "sanderschulhoff@gmail.com"
-
-TAGS = ('YTA', 'NTA', 'NAH', 'ESH')
 
 def read_json(path):
     return pd.read_json(path)
