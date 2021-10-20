@@ -1,5 +1,8 @@
 import json 
 
+POST_SCORE_THRESHOLD = 50
+COMMENT_SCORE_THRESHOLD = 50
+
 COMMENTS_FILE = 'parsedcomments.json'
 POSTS_FILE = 'parsedposts.json'
 
@@ -23,10 +26,10 @@ def main() :
     linked = 0
     for post in posts :
 
-        if post['score'] < 50 :
+        if post['score'] < POST_SCORE_THRESHOLD :
             continue
 
-        top_comment = {'comment_id': None, 'score': 50}
+        top_comment = {'comment_id': None, 'score': COMMENT_SCORE_THRESHOLD}
         for comment in comments :
             post_id = comment['post_id'][3:]
             if post_id == post['id'] :
