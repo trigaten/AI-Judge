@@ -9,6 +9,14 @@ import nltk
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize 
 
+from gensim.models import Word2Vec
+from gensim import corpora
+
+import torch
+from torch.nn import Embedding
+
+MIN_WORD_COUNT = 4
+
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
@@ -17,20 +25,20 @@ def read_json(path):
 
 def preprocess(df, binary_classes=True):
     """
-    tokenizes and encodes class numerically
+    Tokenizes and encodes class numerically
 
     :param binary_classes: If True, considers YTA and ESH to be the same 
         class (1) and NTA and NAH to be the same class (0)
     """
 
     # Select columns to apply preprocessing to
-    pp_cols = ["title", "body", "comment_body"]
+    pp_cols = ["title", "post_body", "comment_body"]
 
     # tokenize data
     df[pp_cols] = df[pp_cols].applymap(lambda s:word_tokenize(s))
 
     # combine title and body of post
-    df["body"] = df["title"] + df["body"]
+    df["post_body"] = df["title"] + df["post_body"]
 
     # get rid of now redundant title column
     df.drop(columns=["title"], axis=1, inplace=True)
@@ -42,7 +50,7 @@ def preprocess(df, binary_classes=True):
         
     return df
 
-def gen_vocabulary(df, min_count=4, comment=True):
+def gen_vocabulary(df, min_count=MIN_WORD_COUNT, comment=True):
     """
     Generate a list of unique words in the corpus
     
@@ -59,7 +67,7 @@ def gen_vocabulary(df, min_count=4, comment=True):
             else:
                 vocabulary[word]=1
 
-    df["body"].apply(lambda arr: dmap(arr))
+    df["post_body"].apply(lambda arr: dmap(arr))
 
     if comment:
         df["comment_body"].apply(lambda arr: dmap(arr))
@@ -75,9 +83,43 @@ def gen_vocabulary(df, min_count=4, comment=True):
     return vocabulary
 
 
+"""
+Functions which support the generation/saving/loading of embeddings.
+"""
+
+def train_embeddings(df, save_path=None, eps=1000):
+
+    posts = list(df["post_body"])
+
+    model = Word2Vec(sentences=posts, vector_size=30, epochs=eps, min_count=MIN_WORD_COUNT, window=2)
+
+    if save_path:
+        model.save(save_path)
+
+    return model
+
+
+def load_embeddings(save_path):
+    """Abstract the loading process so don't need gensim calls in other files"""
+    return Word2Vec.load(save_path)
+
+def gensim_to_pytorch(gse):
+    """
+    Convert a gensim word2vec to a pytorch embedding
+    :return: Tuple containing a word to index dictionary and the Pytorch embedding
+    """
+    word_to_idx = {word:index for index, word in enumerate(gse.wv.index_to_key)}
+    weights = torch.FloatTensor([gse.wv.get_vector(word) for word in gse.wv.index_to_key])
+    embed = Embedding.from_pretrained(weights)
+    
+    return word_to_idx, embed
+
+
+
+
 if __name__ == "__main__":
     df = read_json("example.json")
 
     df = preprocess(df)
 
-    gen_vocabulary(df, 4)
+    gen_vocabulary(df, MIN_WORD_COUNT)
