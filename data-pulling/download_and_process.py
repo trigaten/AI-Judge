@@ -1,7 +1,13 @@
+"""Downloads and unzips reddit post and comment data by month
+    before running parsing script and storing results in a folder"""
+
 import requests
 import shutil
 import sys
 import os
+
+__author__ = "Gayatri Gopavajhala"
+__email__ = "gayatri924@gmail.com"
 
 #all dates are in year, month format
 date = [int(sys.argv[1]), int(sys.argv[2])]
@@ -10,7 +16,9 @@ if len(sys.argv) > 3:
 else:
   end_date = [2021, 6]
 
+#loop through the months
 while True:
+  #id the file extension for comment data
   if date[0] >= 2018 and date[1] >= 10:
     end_string = ".zst"
     unzip_comment = "unzstd RC_" + str(date[0]) + "-" + str(date[1]) + ".zst"
@@ -32,6 +40,8 @@ while True:
     os.mkdir("Linked_JSON_Files")
   except OSError as error:
     pass
+
+  #download files
   r = requests.get(comment_link, stream=True)
   with open(comment_save, 'wb') as f:
     f.write(r.content)
@@ -40,14 +50,18 @@ while True:
   with open(post_save, 'wb') as f:
     f.write(r.content)
     shutil.copyfileobj(r.raw, f)
+
+  #unzip files
   os.system(unzip_comment)
   unzip_post = "unzstd RS_" + str(date[0]) + "-" + str(date[1]) + ".zst --memory=2048MB"
   os.system(unzip_post)
   os.remove(post_save)
 
-  os.system("./parse.sh " + unzip_post + " " + unzip_comment)
+  #run parsing code and save to folder (not fully tested yet)
+  os.system("./parse.sh " + post_save[:-4] + " " + comment_save[:-4])
   shutil.move("linked.json", "Linked_JSON_Files/" + str(date[0]) + "-" + str(date[1]) + ".json")
 
+  #increment month
   if date[0] == end_date[0] and date[1] == end_date[1]:
     break;
   date[1] += 1

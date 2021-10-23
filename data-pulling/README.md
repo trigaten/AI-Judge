@@ -1,4 +1,4 @@
-# Setup instructions
+# Setup instructions for parsing individual months
 
 ## Required tools
 - Python 3.6+
@@ -29,3 +29,11 @@
 		- e.g. `RC_2021-06`
 	- e.g. `./parse.sh RS_2021-06 RC_2021-06`
 4. Done! Final output is in the file `linked.json` and can be used for training.
+
+# Instructions for multiple months
+
+The download_and_process.py file downloads multiple months' worth of data and runs the above code on them, before storing all linked files to a folder.
+
+Run download_and_process.py using `python3 download_and_process.py <start_year> <start_month> <optional: end_year> <optional: end_month>`
+
+If an end month isn't provided, then the code will download from the start month until the most recently available data (June 2021).
