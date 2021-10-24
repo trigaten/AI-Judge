@@ -114,8 +114,8 @@ def gensim_to_pytorch(gse):
     
     return word_to_idx, embed
 
-
-
+def get_embeddings(path="embeddings_30_1000"):
+    return gensim_to_pytorch(load_embeddings(path))
 
 if __name__ == "__main__":
     df = read_json("example.json")
