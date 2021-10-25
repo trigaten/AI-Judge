@@ -2,6 +2,7 @@ import utils
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets
 import pandas as pd
+import utils
 
 """
 Dataset and dataloader. Can be used to sample from dataset.
@@ -9,10 +10,6 @@ Dataset and dataloader. Can be used to sample from dataset.
 
 __authors__ = ["Luke Luo", "Sander Schulhoff"]
 __email__= "lluo6658@gmail.com"
-
-START_TOKEN = "<BEG>"
-END_TOKEN = "<END>"
-UNKNOWN_TOKEN = "<UNK>"
 
 """
 ID: post_body
@@ -39,19 +36,20 @@ class AITA_Dataset(Dataset):
         """
         X = self.list_ids[idx]
         y = self.list_labels[idx]
+        print(X)
         return self.apply_special_tokens(X), self.apply_special_tokens(y)
 
     def apply_special_tokens(self, sentence):
         """
-        Adds begin and end tokens. Also replaces words not in 
+        Add begin and end tokens. Also replace words not in 
         vocabulary with unknown token
-        :param sentence: a list of words
+        :param sentence: a list of strings
         """
         for i, word in enumerate(sentence):
             if word not in self.vocabulary:
-                sentence[i] = UNKNOWN_TOKEN
-
-        return [START_TOKEN] + sentence + [END_TOKEN]
+                sentence[i] = utils.UNKNOWN_TOKEN
+        
+        return [utils.START_TOKEN] + sentence + [utils.END_TOKEN]
 
 """
 Creates a Dataset using post_body and comment_body columns of dataframe
@@ -82,3 +80,4 @@ def sample_dl(dl):
     post.comment_body[1] = list2
     
     return post
+
