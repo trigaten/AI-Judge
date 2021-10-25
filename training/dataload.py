@@ -17,9 +17,9 @@ label: comment_body
 Both are stored in tokenized form
 """
 class AITA_Dataset(Dataset):
-    def __init__(self, list_ids, list_labels):
-        self.list_ids = list_ids
-        self.list_labels = list_labels
+    def __init__(self, df):
+        self.list_ids = df['post_body']
+        self.list_labels = df['comment_body']
         
     def __len__(self):
         return len(self.list_labels)
@@ -35,7 +35,7 @@ class AITA_Dataset(Dataset):
 Creates a Dataset using post_body and comment_body columns of dataframe
 """
 def get_dataloader(df):
-    ds = AITA_Dataset(df.post_body, df.comment_body)
+    ds = AITA_Dataset(df)
     
     loader = DataLoader(ds, batch_size=1, shuffle=True)
     
