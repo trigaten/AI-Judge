@@ -37,6 +37,9 @@ def preprocess(df, binary_classes=True):
     # tokenize data
     df[pp_cols] = df[pp_cols].applymap(lambda s:word_tokenize(s))
 
+    # make all lowercase
+    data[pp_cols] = data[pp_cols].applymap(lambda s:s.lower())
+
     # combine title and body of post
     df["post_body"] = df["title"] + df["post_body"]
 
