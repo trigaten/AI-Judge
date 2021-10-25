@@ -77,9 +77,6 @@ def gen_vocabulary(df, min_count=MIN_WORD_COUNT, comment=True):
 
     vocabulary =  list(vocabulary)
 
-    # append special tokens
-    # vocabulary += ["<UNK>", "<BEG>", "<END>"]
-
     return vocabulary
 
 
