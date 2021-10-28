@@ -36,7 +36,7 @@ class AITA_Dataset(Dataset):
         """
         X = self.list_ids[idx]
         y = self.list_labels[idx]
-        print(X)
+        # print(X)
         return self.apply_special_tokens(X), self.apply_special_tokens(y)
 
     def apply_special_tokens(self, sentence):
@@ -47,17 +47,26 @@ class AITA_Dataset(Dataset):
         """
         for i, word in enumerate(sentence):
             if word not in self.vocabulary:
-                sentence[i] = utils.UNKNOWN_TOKEN
+                sentence[i] = "<UNK>"
         
         return [utils.START_TOKEN] + sentence + [utils.END_TOKEN]
 
 """
+Collator function to be called with dataloader
+"""
+def collator(batch):
+    # print(batch[0][1])
+    return {
+        (x[0] for x in batch),
+        (x[1] for x in batch)
+    }
+"""
 Creates a Dataset using post_body and comment_body columns of dataframe
 """
-def get_dataloader(df):
-    ds = AITA_Dataset(df)
+def get_dataloader(df, vocab, batch_size=5):
+    ds = AITA_Dataset(df, vocab)
     
-    loader = DataLoader(ds, batch_size=5, shuffle=True)
+    loader = DataLoader(ds, batch_size=batch_size, shuffle=True, collate_fn=collator)
     
     return loader
 
@@ -66,18 +75,11 @@ def get_dataloader(df):
 Samples a single post as a dataframe and unpacks the tuples
 """
 def sample_dl(dl):
-    train_features, train_labels = enumerate(next(iter(dl)))
-    post = pd.DataFrame([train_features, train_labels], ['post_body', 'comment_body'])
-    post = post.drop(0, 1)
-    post = post.transpose()
+    features, labels = next(iter(loader))
     
-    list1, list2 = [], []
-    for i in range(len(post.post_body[1])):
-        list1.append(post.post_body[1][i][0])
-    for i in range(len(post.comment_body[1])):
-        list2.append(post.comment_body[1][i][0])
-    post.post_body[1] = list1
-    post.comment_body[1] = list2
+    batch = pd.DataFrame([features, labels], ['post_body', 'comment_body'])
+    batch = batch.drop(0, 1)
+    batch = batch.transpose()
     
-    return post
+    return batch
 
