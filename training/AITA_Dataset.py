@@ -18,14 +18,15 @@ label: comment_body
 Both are stored in tokenized form
 """
 class AITA_Dataset(Dataset):
-    def __init__(self, df, vocabulary):
+    def __init__(self, df, post_vocab, comm_vocab):
         """
         :param df: a pandas dataframe
         :param vocabulary: a list or dictionary strings
         """
         self.list_ids = df['post_body']
         self.list_labels = df['comment_body']
-        self.vocabulary = vocabulary
+        self.post_vocab = post_vocab
+        self.comm_vocab = comm_vocab
 
     def __len__(self):
         return len(self.list_labels)
@@ -37,7 +38,7 @@ class AITA_Dataset(Dataset):
         X = self.list_ids[idx]
         y = self.list_labels[idx]
         # print(X)
-        return self.apply_special_tokens(X), self.apply_special_tokens(y)
+        return self.apply_special_tokens(X, self.post_vocab), self.apply_special_tokens(y, self.comm_vocab)
 
     def apply_special_tokens(self, sentence):
         """
@@ -45,7 +46,7 @@ class AITA_Dataset(Dataset):
         vocabulary with unknown token
         :param sentence: a list of strings
         """
-        for i, word in enumerate(sentence):
+        for i, word in enumerate(sentence, vocab):
             if word not in self.vocabulary:
                 sentence[i] = "<UNK>"
         
