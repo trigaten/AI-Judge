@@ -47,7 +47,7 @@ class AITA_Dataset(Dataset):
         :param sentence: a list of strings
         """
         for i, word in enumerate(sentence, vocab):
-            if word not in self.vocabulary:
+            if word not in vocab:
                 sentence[i] = "<UNK>"
         
         return [utils.START_TOKEN] + sentence + [utils.END_TOKEN]
