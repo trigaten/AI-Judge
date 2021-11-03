@@ -46,9 +46,9 @@ class AITA_Dataset(Dataset):
         vocabulary with unknown token
         :param sentence: a list of strings
         """
-        for i, word in enumerate(sentence, vocab):
+        for word in enumerate(sentence):
             if word not in vocab:
-                sentence[i] = "<UNK>"
+                sentence[word] = utils.UNKNOWN_TOKEN
         
         return [utils.START_TOKEN] + sentence + [utils.END_TOKEN]
 
