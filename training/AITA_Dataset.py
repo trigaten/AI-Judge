@@ -40,7 +40,7 @@ class AITA_Dataset(Dataset):
         # print(X)
         return self.apply_special_tokens(X, self.post_vocab), self.apply_special_tokens(y, self.comm_vocab)
 
-    def apply_special_tokens(self, sentence):
+    def apply_special_tokens(self, sentence, vocab):
         """
         Add begin and end tokens. Also replace words not in 
         vocabulary with unknown token
