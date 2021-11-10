@@ -22,10 +22,10 @@ class Encoder(nn.Module):
     def __init__(self, post_embeddings):
         super().__init__()
         self.post_embeddings = post_embeddings
-        self.encoder = nn.GRU(30, 1200, 3, batch_first=True, bidirectional=False)
+        self.encoder = nn.GRU(30, 1200, 2, batch_first=True, bidirectional=False)
         
     def forward(self, x):
-        embedded = self.post_embedding(x)
+        embedded = self.post_embeddings(x)
         # push vector through encoder
         # then take just the hidden vectors as the context vectors
         out, h_n = self.encoder(embedded)
@@ -37,7 +37,7 @@ class Decoder(nn.Module):
     def __init__(self, comment_embeddings):
         super().__init__()
         self.comment_embeddings = comment_embeddings
-        self.decoder = nn.GRU(30, 1200, 3, batch_first=True, bidirectional=False)
+        self.decoder = nn.GRU(30, 1200, 2, batch_first=True, bidirectional=False)
         self.fc = nn.Linear(1200, comment_embeddings.num_embeddings)
 
     def forward(self, context, last_output_word):
@@ -49,4 +49,4 @@ class Decoder(nn.Module):
         embedded = self.comment_embeddings(last_output_word)
         out, h_n = self.decoder(context, embedded)
 
-        return h_n
+        return self.fc(h_n), h_n
