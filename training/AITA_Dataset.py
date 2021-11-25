@@ -56,11 +56,43 @@ class AITA_Dataset(Dataset):
 Collator function to be called with dataloader
 """
 def collator(batch):
-    # print(batch[0][1])
-    return {
-        (x[0] for x in batch),
-        (x[1] for x in batch)
-    }
+
+    ids = (x[0] for x in batch)
+    labels = (x[1] for x in batch)
+    
+    id_lengths = [len(sentence) for sentence in ids]
+    label_lengths = [len(sentence) for sentence in labels]
+    
+    id_longest = max(id_lengths)
+    id_batch_size = len(id_lengths)
+    padded_ids = np.ones((id_batch_size, 0)).tolist()
+    
+    label_longest = max(label_lengths)
+    label_batch_size = len(label_lengths)
+    padded_labels = np.ones((label_batch_size, 0)).tolist()
+     
+    # pad ids
+    
+    for i, length in enumerate(id_lengths):
+        sequence = batch[i][0]
+        for n in range(length, id_longest):
+            sequence.append(utils.PAD_TOKEN)
+
+        padded_ids[i].append(sequence)
+        padded_ids[i] = padded_ids[i][0]
+            
+    # pad labels
+                            
+    for i, length in enumerate(label_lengths):
+        sequence = batch[i][1]
+        for n in range(length, label_longest):
+            sequence.append(utils.PAD_TOKEN)
+        
+        padded_labels[i].append(sequence)
+        padded_labels[i] = padded_labels[i][0]
+               
+    return (padded_ids, padded_labels)
+
 """
 Creates a Dataset using post_body and comment_body columns of dataframe
 """
