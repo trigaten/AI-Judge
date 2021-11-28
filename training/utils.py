@@ -30,6 +30,7 @@ MIN_WORD_COUNT = 4
 START_TOKEN = "<BEG>"
 END_TOKEN = "<END>"
 UNKNOWN_TOKEN = "<UNK>"
+PADDING_TOKEN = "<PAD>"
 
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
