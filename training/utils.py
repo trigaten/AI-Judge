@@ -9,6 +9,13 @@ import nltk
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize 
 
+# import stemmer
+from nltk.stem import PorterStemmer 
+
+# remove stopwords
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+
 from gensim.models import Word2Vec
 from gensim import corpora
 
@@ -17,10 +24,13 @@ from torch.nn import Embedding
 
 import numpy as np
 
+import re
+
 MIN_WORD_COUNT = 4
 START_TOKEN = "<BEG>"
 END_TOKEN = "<END>"
 UNKNOWN_TOKEN = "<UNK>"
+PADDING_TOKEN = "<PAD>"
 
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
@@ -36,15 +46,30 @@ def preprocess(df, binary_classes=True):
         class (1) and NTA and NAH to be the same class (0)
     """
 
+    ps = PorterStemmer() 
+
     # Select columns to apply preprocessing to
     pp_cols = ["title", "post_body", "comment_body"]
     
     # make all lowercase
     df[pp_cols] = df[pp_cols].applymap(lambda s:s.lower())
     
+    # comment only
+
+    # Removing prefixed 'b'
+    df["comment_body"] = df["comment_body"].apply(lambda s:re.sub(r'^b\s+', ' ',s,flags=re.I))
+
+    # remove all of: x200b (zero-width space)
+    df["comment_body"] = df["comment_body"].apply(lambda s:re.sub(r'x200b', ' ',s))
+
+    # Substituting multiple spaces with single space
+    df["comment_body"] = df["comment_body"].apply(lambda s:re.sub(r'\s+', ' ',s,flags=re.I))
+
+    # post only
+
     # combine title and body of post
-    df["post_body"] = df["post_body"].applymap(lambda x: x + " ")
-    df["post_body"] = df["title"] + " " +  df["post_body"]
+    df["post_body"] = df["post_body"].apply(lambda x: x + " ")
+    df["post_body"] = df["title"] + df["post_body"]
 
     # get rid of now redundant title column
     df.drop(columns=["title"], axis=1, inplace=True)
@@ -52,37 +77,35 @@ def preprocess(df, binary_classes=True):
     # apply to post only
 
     # Remove all the special characters
-    df["post_body"] = df["post_body"].applymap(lambda s:re.sub(r'\W', ' ',s))
+    df["post_body"] = df["post_body"].apply(lambda s:re.sub(r'\W', ' ',s))
 
     # remove all single characters
-    df["post_body"] = df["post_body"].applymap(lambda s:re.sub(r'\s+[a-zA-Z]\s+', ' ',s))
+    df["post_body"] = df["post_body"].apply(lambda s:re.sub(r'\s+[a-zA-Z]\s+', ' ',s))
 
     # Remove single characters from the start (no space before them, but space after)
-    df["post_body"] = df["post_body"].applymap(lambda s:re.sub(r'^[a-zA-Z]\s+', ' ',s))
+    df["post_body"] = df["post_body"].apply(lambda s:re.sub(r'^[a-zA-Z]\s+', ' ',s))
 
     # Removing prefixed 'b'
-    df["post_body"] = df["post_body"].applymap(lambda s:re.sub(r'^b\s+', ' ',s,flags=re.I))
+    df["post_body"] = df["post_body"].apply(lambda s:re.sub(r'^b\s+', ' ',s,flags=re.I))
 
     # remove all of: x200b (zero-width space)
-    df["post_body"] = df["post_body"].applymap(lambda s:re.sub(r'x200b', ' ',s))
+    df["post_body"] = df["post_body"].apply(lambda s:re.sub(r'x200b', ' ',s))
 
     # Substituting multiple spaces with single space
-    df["post_body"] = df["post_body"].applymap(lambda s:re.sub(r'\s+', ' ',s,flags=re.I))
+    df["post_body"] = df["post_body"].apply(lambda s:re.sub(r'\s+', ' ',s,flags=re.I))
 
     # Remove single numbers
-    df["post_body"] = df["post_body"].applymap(lambda s:re.sub(r'\d+', ' ',s,flags=re.I))
-
-    # remove stopwords
-    df["post_body"] = df["post_body"].applymap(lambda s: [word for word in s if word not in stopwords.words('english')])
-    
+    df["post_body"] = df["post_body"].apply(lambda s:re.sub(r'\d+', ' ',s,flags=re.I))
+   
     # tokenize df
-    df["post_body"] = df["post_body"].applymap(lambda s:word_tokenize(s))
+    df[["post_body", "comment_body"]] = df[["post_body", "comment_body"]].applymap(lambda s:word_tokenize(s))
 
-    # perform stemming
-    df["post_body"] = df["post_body"].applymap(lambda s: [ps.stem(word) for word in s])
+    # perform stemming on posts only
+    df["post_body"] = df["post_body"].apply(lambda s: [ps.stem(word) for word in s])
 
-     # tokenize data
-    df[pp_cols] = df[pp_cols].applymap(lambda s:word_tokenize(s))    
+     # remove stopwords
+    # df["post_body"] = df["post_body"].apply(lambda s: [word for word in s if word not in stopwords.words('english')])
+    
 
     if binary_classes:
         df["judgement"] = df["judgement"].map({"YTA":1, "ESH":1, "NTA":0, "NAH":0})
