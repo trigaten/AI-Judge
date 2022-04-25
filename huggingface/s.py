@@ -17,5 +17,5 @@ def preprocess_function(examples):
 
 
 tokenized_dataset2 = dataset2.map(preprocess_function, batched=True)
-print(tokenized_dataset2)
+# print(tokenized_dataset2)
 print(tokenized_dataset2["train"][0])
